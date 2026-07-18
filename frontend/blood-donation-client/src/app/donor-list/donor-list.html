@@ -1,0 +1,102 @@
+<div class="container">
+
+    <div class="header">
+
+        <h2>🩸 Donor Management</h2>
+
+        <div>
+            <p><b>Total Donors:</b> {{ donors.length }}</p>
+
+            <button class="add-btn" (click)="addDonor()">
+                + Add Donor
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Testing -->
+    <pre>{{ donors | json }}</pre>
+
+    <table *ngIf="donors.length > 0">
+
+        <thead>
+
+            <tr>
+
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Blood Group</th>
+                <th>Gender</th>
+                <th>Weight</th>
+                <th>Eligible</th>
+                <th>Actions</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            <tr *ngFor="let donor of donors">
+
+                <td>{{ donor.donorId }}</td>
+
+                <td>{{ donor.fullName }}</td>
+
+                <td>{{ donor.email }}</td>
+
+                <td>{{ donor.phoneNumber }}</td>
+
+                <td>
+                    <span class="blood">
+                        {{ donor.bloodGroup }}
+                    </span>
+                </td>
+
+                <td>{{ donor.gender }}</td>
+
+                <td>{{ donor.weight }} Kg</td>
+
+                <td>
+
+                    <span
+                        [class.yes]="donor.isEligible"
+                        [class.no]="!donor.isEligible">
+
+                        {{ donor.isEligible ? 'Eligible' : 'Not Eligible' }}
+
+                    </span>
+
+                </td>
+
+                <td>
+
+                    <button class="edit-btn">
+                        Edit
+                    </button>
+
+                    <button
+                        class="delete-btn"
+                        (click)="deleteDonor(donor.donorId)">
+
+                        Delete
+
+                    </button>
+
+                </td>
+
+            </tr>
+
+        </tbody>
+
+    </table>
+
+    <div *ngIf="donors.length == 0" class="no-data">
+
+        <h3>No Donors Found</h3>
+
+    </div>
+
+</div>

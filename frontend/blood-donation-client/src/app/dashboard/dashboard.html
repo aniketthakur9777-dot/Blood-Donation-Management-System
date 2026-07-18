@@ -1,0 +1,47 @@
+<div class="dashboard">
+
+  <h1>🩸 Blood Donation Management System</h1>
+
+  <h2>Welcome {{ fullName }}</h2>
+
+  <div class="cards">
+
+    <div class="card">
+      <h3>Total Donors</h3>
+      <p>0</p>
+    </div>
+
+    <div class="card">
+      <h3>Blood Requests</h3>
+      <p>0</p>
+    </div>
+
+    <div class="card">
+      <h3>Blood Inventory</h3>
+      <p>0</p>
+    </div>
+
+    <div class="card">
+      <h3>Donation History</h3>
+      <p>{{ totalDonors }}</p>
+    </div>
+
+  </div>
+
+  <div class="menu">
+
+    <button routerLink="/donor-list">Donors</button>
+
+    <button>Blood Requests</button>
+
+    <button>Inventory</button>
+
+    <button>Donation History</button>
+
+    <button>Notifications</button>
+
+    <button (click)="logout()">Logout</button>
+
+  </div>
+
+</div>
