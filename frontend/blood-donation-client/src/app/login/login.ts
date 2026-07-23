@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Auth } from '../services/auth';
@@ -6,60 +7,46 @@ import { Auth } from '../services/auth';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
 export class Login {
+  email = '';
+  password = '';
+  errorMessage = '';
+  isLoading = false;
+  showPassword = false;
 
-  email: string = '';
-  password: string = '';
-
-  constructor(
-    private auth: Auth,
-    private router: Router
-  ) { }
+  constructor(private auth: Auth, private router: Router) {}
 
   login() {
-
-    const user = {
-      email: this.email,
-      password: this.password
-    };
-
-    this.auth.login(user).subscribe({
-
-      next: (response: any) => {
-
-        // Save Login Data
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('userId', response.userId.toString());
-        localStorage.setItem('fullName', response.fullName);
-        localStorage.setItem('roleId', response.roleId.toString());
-
-        console.log(response);
-
-        alert(response.message);
-
-        this.router.navigate(['/dashboard']);
-
+    if (!this.email || !this.password) {
+      this.errorMessage = 'Please enter both email and password.';
+      return;
+    }
+    this.errorMessage = '';
+    this.isLoading = true;
+    this.auth.login({ email: this.email, password: this.password }).subscribe({
+      next: (res) => {
+        this.isLoading = false;
+        // Role-based redirection
+        const user = this.auth.currentUserSignal();
+        if (user?.roleId === 1) {
+          this.router.navigate(['/admin/dashboard']);
+        } else {
+          this.router.navigate(['/donor/dashboard']);
+        }
       },
-
-      error: (error) => {
-
-        console.log(error);
-
-        if (error.error?.message) {
-          alert(error.error.message);
-        }
-        else {
-          alert("Invalid Email or Password");
-        }
-
+      error: (err) => {
+        this.isLoading = false;
+        this.errorMessage = err.error?.message || 'Invalid email or password.';
       }
-
     });
-
   }
 
+  fillDemo() {
+    this.email = 'aniket@gmail.com';
+    this.password = '123456';
+  }
 }

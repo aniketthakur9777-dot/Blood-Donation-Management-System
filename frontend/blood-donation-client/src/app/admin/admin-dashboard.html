@@ -1,0 +1,440 @@
+<div class="admin-shell">
+  <!-- SIDEBAR NAVIGATION -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo">
+        <i class="fa-solid fa-square-h text-red-500 text-2xl"></i>
+      </div>
+      <div>
+        <h2 class="brand-name">BloodPulse</h2>
+        <span class="brand-sub">HOSPITAL COMMAND</span>
+      </div>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="user-avatar"><i class="fa-solid fa-user-shield"></i></div>
+      <div class="user-info">
+        <span class="user-name">{{ fullName }}</span>
+        <span class="user-role-badge">System Administrator</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="nav-item" [class.active]="activeTab === 'overview'" (click)="activeTab = 'overview'">
+        <i class="fa-solid fa-chart-line"></i> Dashboard Overview
+      </button>
+      <button class="nav-item" [class.active]="activeTab === 'donors'" (click)="activeTab = 'donors'">
+        <i class="fa-solid fa-users"></i> Donor Directory
+        <span class="nav-badge">{{ totalDonors }}</span>
+      </button>
+      <button class="nav-item" [class.active]="activeTab === 'inventory'" (click)="activeTab = 'inventory'">
+        <i class="fa-solid fa-boxes-stacked"></i> Blood Inventory
+        <span class="nav-badge accent-blue">{{ totalUnits }} U</span>
+      </button>
+      <button class="nav-item" [class.active]="activeTab === 'requests'" (click)="activeTab = 'requests'">
+        <i class="fa-solid fa-hand-holding-medical"></i> Requisitions
+        <span class="nav-badge accent-amber" *ngIf="pendingRequestsCount > 0">{{ pendingRequestsCount }}</span>
+      </button>
+      <button class="nav-item" [class.active]="activeTab === 'history'" (click)="activeTab = 'history'">
+        <i class="fa-solid fa-clock-rotate-left"></i> Donation History
+      </button>
+      <button class="nav-item" [class.active]="activeTab === 'users'" (click)="activeTab = 'users'">
+        <i class="fa-solid fa-user-gear"></i> User Management
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="btn-logout" (click)="logout()">
+        <i class="fa-solid fa-right-from-bracket"></i> End Admin Session
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT AREA -->
+  <main class="admin-main">
+    <!-- TOP EXECUTIVE NAVBAR -->
+    <header class="top-header">
+      <div class="header-left">
+        <h1 class="header-title">
+          <ng-container [ngSwitch]="activeTab">
+            <span *ngSwitchCase="'overview'"><i class="fa-solid fa-hospital me-2 text-red-500"></i> Hospital Command Center</span>
+            <span *ngSwitchCase="'donors'"><i class="fa-solid fa-users me-2 text-red-500"></i> Donor Registry Management</span>
+            <span *ngSwitchCase="'inventory'"><i class="fa-solid fa-boxes-stacked me-2 text-red-500"></i> Blood Bank Inventory Matrix</span>
+            <span *ngSwitchCase="'requests'"><i class="fa-solid fa-hand-holding-medical me-2 text-red-500"></i> Emergency Requisition Approvals</span>
+            <span *ngSwitchCase="'history'"><i class="fa-solid fa-clock-rotate-left me-2 text-red-500"></i> Master Donation Audit Log</span>
+            <span *ngSwitchCase="'users'"><i class="fa-solid fa-user-gear me-2 text-red-500"></i> Registered Account Security</span>
+          </ng-container>
+        </h1>
+      </div>
+      <div class="header-right">
+        <button class="btn-primary btn-sm" (click)="openAddDonor()">
+          <i class="fa-solid fa-user-plus"></i> New Donor
+        </button>
+        <button class="btn-secondary btn-sm" (click)="openLogDonationModal()">
+          <i class="fa-solid fa-droplet"></i> Record Donation
+        </button>
+      </div>
+    </header>
+
+    <!-- TAB 1: OVERVIEW -->
+    <div class="tab-content" *ngIf="activeTab === 'overview'">
+      <!-- Pending Requisitions Alert -->
+      <div class="alert-banner mb-6" *ngIf="pendingRequestsCount > 0">
+        <div class="banner-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div class="banner-body">
+          <h4 class="banner-title">ACTION REQUIRED: {{ pendingRequestsCount }} Pending Emergency Requests</h4>
+          <p class="banner-desc">Hospital patients are awaiting authorization for critical blood supply dispatch.</p>
+        </div>
+        <button class="btn-primary btn-sm" (click)="activeTab = 'requests'">Review Requisitions</button>
+      </div>
+
+      <!-- Metrics Cards -->
+      <div class="stats-row mb-6">
+        <div class="metric-card" (click)="activeTab = 'donors'">
+          <div class="metric-icon red-icon"><i class="fa-solid fa-users"></i></div>
+          <div class="metric-data">
+            <span class="metric-label">REGISTERED DONORS</span>
+            <h3 class="metric-value">{{ totalDonors }}</h3>
+            <span class="metric-sub">Active hospital network</span>
+          </div>
+        </div>
+
+        <div class="metric-card" (click)="activeTab = 'inventory'">
+          <div class="metric-icon blue-icon"><i class="fa-solid fa-vials"></i></div>
+          <div class="metric-data">
+            <span class="metric-label">AVAILABLE UNITS</span>
+            <h3 class="metric-value">{{ totalUnits }} <span class="text-xs">Units</span></h3>
+            <span class="metric-sub">Across 8 blood groups</span>
+          </div>
+        </div>
+
+        <div class="metric-card" (click)="activeTab = 'requests'">
+          <div class="metric-icon amber-icon"><i class="fa-solid fa-hand-holding-medical"></i></div>
+          <div class="metric-data">
+            <span class="metric-label">PENDING REQUESTS</span>
+            <h3 class="metric-value">{{ pendingRequestsCount }}</h3>
+            <span class="metric-sub">Requires authorization</span>
+          </div>
+        </div>
+
+        <div class="metric-card" (click)="activeTab = 'history'">
+          <div class="metric-icon green-icon"><i class="fa-solid fa-heart-circle-check"></i></div>
+          <div class="metric-data">
+            <span class="metric-label">TOTAL DONATIONS</span>
+            <h3 class="metric-value">{{ totalDonationsCount }}</h3>
+            <span class="metric-sub">Lives saved to date</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Inventory Grid & Recent Requisitions -->
+      <div class="grid-2col gap-6">
+        <div class="glass-card panel-card">
+          <div class="panel-header">
+            <h3><i class="fa-solid fa-droplet text-red-500 me-2"></i> Live Inventory Stock</h3>
+            <button class="btn-secondary btn-sm" (click)="activeTab = 'inventory'">Manage Stock</button>
+          </div>
+          <div class="stock-mini-grid">
+            <div class="stock-mini-item" *ngFor="let item of inventoryList">
+              <span class="stock-blood-group">{{ item.bloodGroup }}</span>
+              <span class="stock-units">{{ item.unitsAvailable }} Units</span>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" [style.width.%]="Math.min(100, (item.unitsAvailable / 20) * 100)"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card panel-card">
+          <div class="panel-header">
+            <h3><i class="fa-solid fa-list-check text-amber-400 me-2"></i> Recent Requests</h3>
+            <button class="btn-secondary btn-sm" (click)="activeTab = 'requests'">View All</button>
+          </div>
+          <div class="mini-request-list">
+            <div class="mini-request-item" *ngFor="let r of requestsList.slice(0, 5)">
+              <div class="req-badge">{{ r.bloodGroup }}</div>
+              <div class="req-info">
+                <h4 class="req-patient">{{ r.patientName }}</h4>
+                <span class="req-hospital">{{ r.hospitalName }} &bull; {{ r.unitsRequired }} Units</span>
+              </div>
+              <span class="badge" [class.badge-warning]="r.status === 'Pending'" [class.badge-success]="r.status === 'Approved' || r.status === 'Fulfilled'" [class.badge-danger]="r.status === 'Rejected'">
+                {{ r.status }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: DONOR DIRECTORY -->
+    <div class="tab-content" *ngIf="activeTab === 'donors'">
+      <div class="glass-card panel-card">
+        <div class="panel-header flex justify-between items-center mb-4">
+          <div class="filter-controls flex gap-3">
+            <input type="text" class="form-control" placeholder="Search by name, city, email..." [(ngModel)]="donorSearch" (input)="applyDonorFilter()" style="max-width: 280px;">
+            <select class="form-control" [(ngModel)]="selectedBloodGroup" (change)="applyDonorFilter()" style="max-width: 160px;">
+              <option value="">All Blood Groups</option>
+              <option *ngFor="let g of ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']" [value]="g">{{ g }}</option>
+            </select>
+          </div>
+          <button class="btn-primary btn-sm" (click)="openAddDonor()"><i class="fa-solid fa-plus"></i> Add Donor</button>
+        </div>
+
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Donor Name</th>
+              <th>Group</th>
+              <th>Phone</th>
+              <th>Email</th>
+              <th>City</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let d of filteredDonors">
+              <td>#{{ d.donorId }}</td>
+              <td><strong>{{ d.fullName }}</strong></td>
+              <td><span class="blood-pill">{{ d.bloodGroup }}</span></td>
+              <td>{{ d.phoneNumber }}</td>
+              <td>{{ d.email || 'N/A' }}</td>
+              <td>{{ d.city || 'N/A' }}</td>
+              <td>
+                <span class="badge" [class.badge-success]="d.isEligible" [class.badge-danger]="!d.isEligible">
+                  {{ d.isEligible ? 'Eligible' : 'Ineligible' }}
+                </span>
+              </td>
+              <td>
+                <button class="icon-btn btn-sm me-1" (click)="openEditDonor(d)"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn-danger btn-sm" (click)="deleteDonor(d.donorId)"><i class="fa-solid fa-trash"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 3: BLOOD INVENTORY -->
+    <div class="tab-content" *ngIf="activeTab === 'inventory'">
+      <div class="glass-card panel-card">
+        <div class="panel-header mb-4 flex justify-between items-center">
+          <h3>Blood Bank Stock Matrix</h3>
+          <button class="btn-primary btn-sm" (click)="openRestockModal()"><i class="fa-solid fa-pen-to-square"></i> Restock Stock</button>
+        </div>
+
+        <div class="inventory-grid">
+          <div class="inventory-card" *ngFor="let item of inventoryList">
+            <div class="inv-group">{{ item.bloodGroup }}</div>
+            <div class="inv-count">{{ item.unitsAvailable }} <span class="inv-label">Units</span></div>
+            <div class="progress-bar-bg my-2">
+              <div class="progress-bar-fill" [style.width.%]="Math.min(100, (item.unitsAvailable / 25) * 100)"></div>
+            </div>
+            <button class="btn-secondary btn-sm w-full" (click)="openRestockModal(item.bloodGroup)">Update Units</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: BLOOD REQUESTS -->
+    <div class="tab-content" *ngIf="activeTab === 'requests'">
+      <div class="glass-card panel-card">
+        <h3 class="mb-4">Emergency Requisition Workflow</h3>
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Req ID</th>
+              <th>Patient Name</th>
+              <th>Blood Group</th>
+              <th>Units</th>
+              <th>Hospital</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of requestsList">
+              <td>#{{ r.requestId }}</td>
+              <td><strong>{{ r.patientName }}</strong></td>
+              <td><span class="blood-pill">{{ r.bloodGroup }}</span></td>
+              <td>{{ r.unitsRequired }}</td>
+              <td>{{ r.hospitalName }}</td>
+              <td>
+                <span class="badge" [class.badge-warning]="r.status === 'Pending'" [class.badge-success]="r.status === 'Approved' || r.status === 'Fulfilled'" [class.badge-danger]="r.status === 'Rejected'">
+                  {{ r.status }}
+                </span>
+              </td>
+              <td>
+                <button class="btn-primary btn-sm me-1" *ngIf="r.status === 'Pending'" (click)="updateRequestStatus(r.requestId, 'Approved')">Approve</button>
+                <button class="btn-danger btn-sm me-1" *ngIf="r.status === 'Pending'" (click)="updateRequestStatus(r.requestId, 'Rejected')">Reject</button>
+                <button class="btn-secondary btn-sm" *ngIf="r.status === 'Approved'" (click)="updateRequestStatus(r.requestId, 'Fulfilled')">Mark Fulfilled</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 5: DONATION HISTORY -->
+    <div class="tab-content" *ngIf="activeTab === 'history'">
+      <div class="glass-card panel-card">
+        <div class="panel-header mb-4 flex justify-between items-center">
+          <h3>Donation Log & Audit Trail</h3>
+          <button class="btn-primary btn-sm" (click)="openLogDonationModal()"><i class="fa-solid fa-plus"></i> Record Donation</button>
+        </div>
+
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Log ID</th>
+              <th>Donor Name</th>
+              <th>Donation Date</th>
+              <th>Units</th>
+              <th>Remarks</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let h of historyList">
+              <td>#{{ h.donationId }}</td>
+              <td><strong>{{ h.donor?.fullName || 'Donor #' + h.donorId }}</strong></td>
+              <td>{{ h.donationDate }}</td>
+              <td>{{ h.unitsDonated }} Units</td>
+              <td>{{ h.remarks || 'Routine' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 6: USER MANAGEMENT -->
+    <div class="tab-content" *ngIf="activeTab === 'users'">
+      <div class="glass-card panel-card">
+        <h3 class="mb-4">Registered User Account Authorization</h3>
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>User ID</th>
+              <th>Full Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let u of usersList">
+              <td>#{{ u.userId }}</td>
+              <td><strong>{{ u.fullName }}</strong></td>
+              <td>{{ u.email }}</td>
+              <td>
+                <span class="badge" [class.badge-info]="u.roleId === 1" [class.badge-warning]="u.roleId === 2">
+                  {{ u.roleId === 1 ? 'Administrator' : 'Donor / User' }}
+                </span>
+              </td>
+              <td>
+                <span class="badge" [class.badge-success]="u.isActive ?? true" [class.badge-danger]="u.isActive === false">
+                  {{ (u.isActive ?? true) ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+              <td>
+                <button class="btn-secondary btn-sm" (click)="toggleUserStatus(u.userId)">
+                  {{ (u.isActive ?? true) ? 'Deactivate' : 'Activate' }}
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL: ADD DONOR -->
+<div class="modal-overlay" *ngIf="showAddDonorModal">
+  <div class="modal-content">
+    <h3>Enroll New Blood Donor</h3>
+    <div class="form-group mt-3">
+      <label class="form-label">Full Name</label>
+      <input type="text" class="form-control" [(ngModel)]="newDonor.fullName">
+    </div>
+    <div class="grid-2col gap-3 mt-2">
+      <div class="form-group">
+        <label class="form-label">Blood Group</label>
+        <select class="form-control" [(ngModel)]="newDonor.bloodGroup">
+          <option *ngFor="let g of ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']" [value]="g">{{ g }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone Number</label>
+        <input type="text" class="form-control" [(ngModel)]="newDonor.phoneNumber">
+      </div>
+    </div>
+    <div class="grid-2col gap-3 mt-2">
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-control" [(ngModel)]="newDonor.email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">City</label>
+        <input type="text" class="form-control" [(ngModel)]="newDonor.city">
+      </div>
+    </div>
+    <div class="flex justify-end gap-2 mt-4">
+      <button class="btn-secondary" (click)="showAddDonorModal = false">Cancel</button>
+      <button class="btn-primary" (click)="saveAddDonor()">Save Donor</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: RESTOCK INVENTORY -->
+<div class="modal-overlay" *ngIf="showStockModal">
+  <div class="modal-content">
+    <h3>Update Inventory Units</h3>
+    <div class="form-group mt-3">
+      <label class="form-label">Blood Group</label>
+      <select class="form-control" [(ngModel)]="selectedStockGroup">
+        <option *ngFor="let g of ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']" [value]="g">{{ g }}</option>
+      </select>
+    </div>
+    <div class="form-group mt-2">
+      <label class="form-label">New Available Units</label>
+      <input type="number" class="form-control" [(ngModel)]="newStockUnits">
+    </div>
+    <div class="flex justify-end gap-2 mt-4">
+      <button class="btn-secondary" (click)="showStockModal = false">Cancel</button>
+      <button class="btn-primary" (click)="saveStockUpdate()">Update Stock</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: LOG DONATION -->
+<div class="modal-overlay" *ngIf="showLogDonationModal">
+  <div class="modal-content">
+    <h3>Record New Donation</h3>
+    <div class="form-group mt-3">
+      <label class="form-label">Select Donor</label>
+      <select class="form-control" [(ngModel)]="donationLog.donorId">
+        <option *ngFor="let d of donorsList" [value]="d.donorId">{{ d.fullName }} ({{ d.bloodGroup }})</option>
+      </select>
+    </div>
+    <div class="grid-2col gap-3 mt-2">
+      <div class="form-group">
+        <label class="form-label">Donation Date</label>
+        <input type="date" class="form-control" [(ngModel)]="donationLog.donationDate">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Units Donated</label>
+        <input type="number" class="form-control" [(ngModel)]="donationLog.unitsDonated">
+      </div>
+    </div>
+    <div class="form-group mt-2">
+      <label class="form-label">Remarks</label>
+      <input type="text" class="form-control" [(ngModel)]="donationLog.remarks">
+    </div>
+    <div class="flex justify-end gap-2 mt-4">
+      <button class="btn-secondary" (click)="showLogDonationModal = false">Cancel</button>
+      <button class="btn-primary" (click)="saveDonationLog()">Save Record</button>
+    </div>
+  </div>
+</div>

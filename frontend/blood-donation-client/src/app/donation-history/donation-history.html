@@ -1,0 +1,126 @@
+<div class="history-container">
+  <!-- Header -->
+  <div class="page-header flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+        <i class="fa-solid fa-clock-rotate-left text-purple-400"></i> Blood Donation Audit Log & History
+      </h1>
+      <p class="text-xs text-slate-400 mt-1">Complete log of all blood contributions, dates & remarks</p>
+    </div>
+    <button class="btn-primary" (click)="openRecordModal()">
+      <i class="fa-solid fa-plus"></i> Record New Donation
+    </button>
+  </div>
+
+  <!-- Search & Toolbar -->
+  <div class="glass-card toolbar-card mb-6">
+    <div class="search-box flex-1">
+      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <input
+        type="text"
+        class="form-control ps-10"
+        placeholder="Search by donor name, blood group, or remarks..."
+        [(ngModel)]="searchTerm"
+        (input)="applyFilter()">
+    </div>
+  </div>
+
+  <!-- History Table Card -->
+  <div class="glass-card overflow-hidden">
+    <div class="table-responsive" *ngIf="filteredHistory.length > 0">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Donation ID</th>
+            <th>Donor Name</th>
+            <th>Blood Group</th>
+            <th>Donation Date</th>
+            <th>Units Contributed</th>
+            <th>Remarks / Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of filteredHistory">
+            <td>
+              <span class="font-mono text-xs text-slate-400">#DON-{{ item.donationId }}</span>
+            </td>
+            <td>
+              <div class="flex items-center gap-3">
+                <div class="avatar text-xs font-bold">{{ item.donorName?.charAt(0) || 'D' }}</div>
+                <h4 class="font-semibold text-white text-sm">{{ item.donorName || 'Registered Donor' }}</h4>
+              </div>
+            </td>
+            <td>
+              <span class="blood-pill">{{ item.bloodGroup }}</span>
+            </td>
+            <td>
+              <span class="text-xs text-slate-300"><i class="fa-regular fa-calendar me-1"></i> {{ item.donationDate }}</span>
+            </td>
+            <td>
+              <span class="badge badge-success font-bold">+ {{ item.unitsDonated }} Units</span>
+            </td>
+            <td>
+              <span class="text-xs text-slate-400">{{ item.remarks || 'Standard donation' }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state p-12 text-center" *ngIf="filteredHistory.length === 0 && !isLoading">
+      <div class="empty-icon text-4xl text-slate-600 mb-3">
+        <i class="fa-solid fa-clock"></i>
+      </div>
+      <h3 class="text-lg font-semibold text-white">No Donation History Found</h3>
+      <p class="text-xs text-slate-400 mt-1">Record a new blood donation to populate the audit log.</p>
+    </div>
+  </div>
+
+  <!-- Record Donation Modal -->
+  <div class="modal-overlay" *ngIf="showModal">
+    <div class="modal-content">
+      <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-hand-holding-medical text-red-500"></i> Record Blood Donation
+        </h3>
+        <button class="icon-btn" (click)="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Select Donor *</label>
+        <select class="form-control" [(ngModel)]="selectedDonorId">
+          <option *ngFor="let d of donorsList" [value]="d.donorId">
+            {{ d.fullName }} ({{ d.bloodGroup }}) - {{ d.phoneNumber }}
+          </option>
+        </select>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div class="form-group">
+          <label class="form-label">Donation Date *</label>
+          <input type="date" class="form-control" [(ngModel)]="donationDate" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Units Donated *</label>
+          <input type="number" class="form-control" [(ngModel)]="unitsDonated" min="1" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Remarks / Medical Notes</label>
+        <input type="text" class="form-control" placeholder="e.g. Voluntary donor camp" [(ngModel)]="remarks">
+      </div>
+
+      <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-800">
+        <button class="btn-secondary" (click)="closeModal()">Cancel</button>
+        <button class="btn-primary" (click)="saveDonation()" [disabled]="isSaving">
+          <i class="fa-solid fa-check" *ngIf="!isSaving"></i>
+          <i class="fa-solid fa-spinner fa-spin" *ngIf="isSaving"></i>
+          <span>{{ isSaving ? 'Saving...' : 'Record Donation' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

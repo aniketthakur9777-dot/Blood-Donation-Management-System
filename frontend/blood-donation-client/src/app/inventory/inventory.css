@@ -1,0 +1,41 @@
+.stock-card {
+  padding: 1.5rem;
+  background: rgba(21, 29, 46, 0.85);
+  border-top: 3px solid #e63946;
+}
+
+.blood-type-display {
+  font-family: var(--font-heading);
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #e63946;
+}
+
+.units-count {
+  line-height: 1;
+}
+
+.grid-cols-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 1024px) {
+  .grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .grid-cols-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-end { justify-content: flex-end; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-6 { gap: 1.5rem; }

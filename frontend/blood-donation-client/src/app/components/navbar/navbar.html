@@ -1,0 +1,133 @@
+<nav class="navbar" [class.scrolled]="scrolled" *ngIf="shouldShowNavbar()">
+  <div class="nav-inner">
+    <!-- Brand -->
+    <a class="nav-brand" [routerLink]="getDashboardLink()">
+      <svg class="brand-icon" width="32" height="32" viewBox="0 0 48 48" fill="none">
+        <path d="M24 4C24 4 8 20 8 30C8 38.8366 15.1634 46 24 46C32.8366 46 40 38.8366 40 30C40 20 24 4 24 4Z" fill="#dc2626"/>
+        <path d="M24 14C24 14 16 24 16 30C16 34.4183 19.5817 38 24 38C28.4183 38 32 34.4183 32 30C32 24 24 14 24 14Z" fill="#ffffff" opacity="0.3"/>
+      </svg>
+      <span class="brand-text">Blood<span class="brand-accent">Pulse</span></span>
+    </a>
+
+    <!-- Desktop Nav Links -->
+    <ul class="nav-links">
+      <li>
+        <a [routerLink]="getDashboardLink()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+          <i class="fa-solid fa-gauge-high"></i> Dashboard
+        </a>
+      </li>
+      <li *ngIf="auth.isAdmin()">
+        <a routerLink="/donor-list" routerLinkActive="active">
+          <i class="fa-solid fa-users"></i> Donors
+        </a>
+      </li>
+      <li *ngIf="auth.isAdmin()">
+        <a routerLink="/inventory" routerLinkActive="active">
+          <i class="fa-solid fa-boxes-stacked"></i> Inventory
+        </a>
+      </li>
+      <li>
+        <a routerLink="/requests" routerLinkActive="active">
+          <i class="fa-solid fa-hand-holding-droplet"></i> Requests
+        </a>
+      </li>
+      <li>
+        <a routerLink="/history" routerLinkActive="active">
+          <i class="fa-solid fa-clock-rotate-left"></i> History
+        </a>
+      </li>
+    </ul>
+
+    <!-- Right Actions -->
+    <div class="nav-actions">
+      <!-- Notifications -->
+      <div class="notif-wrapper">
+        <button class="icon-btn" (click)="toggleNotifications($event)" title="Notifications">
+          <i class="fa-regular fa-bell"></i>
+          <span class="notif-badge" *ngIf="unreadCount > 0">{{ unreadCount > 9 ? '9+' : unreadCount }}</span>
+        </button>
+
+        <!-- Notification Dropdown -->
+        <div class="notif-dropdown" *ngIf="showNotifications">
+          <div class="notif-header">
+            <h4>Notifications</h4>
+            <span class="notif-count" *ngIf="unreadCount > 0">{{ unreadCount }} new</span>
+          </div>
+          <div class="notif-list" *ngIf="notifications.length > 0">
+            <div class="notif-item" *ngFor="let n of notifications"
+                 [class.unread]="!n.isRead"
+                 (click)="markRead(n.notificationId)">
+              <div class="notif-dot" *ngIf="!n.isRead"></div>
+              <div class="notif-body">
+                <p class="notif-msg">{{ n.message }}</p>
+                <span class="notif-time">{{ n.createdAt | date:'short' }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="notif-empty" *ngIf="notifications.length === 0">
+            <i class="fa-regular fa-bell-slash"></i>
+            <span>No notifications yet</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile -->
+      <div class="profile-wrapper">
+        <button class="profile-chip" (click)="toggleProfileMenu($event)">
+          <div class="avatar">{{ getUserInitial() }}</div>
+          <div class="profile-info">
+            <span class="profile-name">{{ getUserName() }}</span>
+            <span class="profile-role">{{ getUserRole() }}</span>
+          </div>
+          <i class="fa-solid fa-chevron-down chevron-icon"></i>
+        </button>
+
+        <!-- Profile Dropdown -->
+        <div class="profile-dropdown" *ngIf="showProfileMenu">
+          <div class="dropdown-user">
+            <div class="avatar avatar-lg">{{ getUserInitial() }}</div>
+            <div>
+              <p class="dropdown-name">{{ getUserName() }}</p>
+              <p class="dropdown-role">{{ getUserRole() }}</p>
+            </div>
+          </div>
+          <div class="dropdown-divider"></div>
+          <button class="dropdown-item" [routerLink]="getDashboardLink()" (click)="showProfileMenu = false">
+            <i class="fa-solid fa-gauge-high"></i> Dashboard
+          </button>
+          <button class="dropdown-item logout-item" (click)="logout()">
+            <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Hamburger -->
+      <button class="hamburger-btn" (click)="toggleMobileMenu()">
+        <i class="fa-solid" [class.fa-bars]="!showMobileMenu" [class.fa-xmark]="showMobileMenu"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" *ngIf="showMobileMenu">
+    <a [routerLink]="getDashboardLink()" routerLinkActive="active" (click)="showMobileMenu = false">
+      <i class="fa-solid fa-gauge-high"></i> Dashboard
+    </a>
+    <a *ngIf="auth.isAdmin()" routerLink="/donor-list" routerLinkActive="active" (click)="showMobileMenu = false">
+      <i class="fa-solid fa-users"></i> Donors
+    </a>
+    <a *ngIf="auth.isAdmin()" routerLink="/inventory" routerLinkActive="active" (click)="showMobileMenu = false">
+      <i class="fa-solid fa-boxes-stacked"></i> Inventory
+    </a>
+    <a routerLink="/requests" routerLinkActive="active" (click)="showMobileMenu = false">
+      <i class="fa-solid fa-hand-holding-droplet"></i> Requests
+    </a>
+    <a routerLink="/history" routerLinkActive="active" (click)="showMobileMenu = false">
+      <i class="fa-solid fa-clock-rotate-left"></i> History
+    </a>
+    <div class="mobile-divider"></div>
+    <a class="mobile-logout" (click)="logout()">
+      <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+    </a>
+  </div>
+</nav>

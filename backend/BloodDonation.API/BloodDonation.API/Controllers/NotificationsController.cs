@@ -1,4 +1,5 @@
-﻿using BloodDonation.API.Data;
+using BloodDonation.API.Data;
+using BloodDonation.API.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,11 +16,31 @@ namespace BloodDonation.API.Controllers
             _context = context;
         }
 
+        // GET: api/Notifications
         [HttpGet]
-        public async Task<IActionResult> GetNotifications()
+        public async Task<IActionResult> GetNotifications([FromQuery] int? userId)
         {
-            var notifications = await _context.Notifications.ToListAsync();
+            var query = _context.Notifications.AsQueryable();
+            if (userId.HasValue)
+            {
+                query = query.Where(n => n.UserId == userId.Value);
+            }
+
+            var notifications = await query.OrderByDescending(n => n.CreatedDate).ToListAsync();
             return Ok(notifications);
+        }
+
+        // PUT: api/Notifications/5/read
+        [HttpPut("{id}/read")]
+        public async Task<IActionResult> MarkAsRead(int id)
+        {
+            var notification = await _context.Notifications.FindAsync(id);
+            if (notification == null) return NotFound(new { success = false, message = "Notification not found" });
+
+            notification.IsRead = true;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Notification marked as read" });
         }
     }
 }

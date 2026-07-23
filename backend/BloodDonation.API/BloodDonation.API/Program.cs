@@ -20,15 +20,16 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // ==========================
-// CORS
+// CORS - Allow Angular & Local Origins
 // ==========================
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngular", policy =>
     {
-        policy.WithOrigins("http://localhost:4200")
+        policy.SetIsOriginAllowed(_ => true)
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .AllowCredentials();
     });
 });
 
@@ -58,6 +59,9 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// Enable CORS early in pipeline
+app.UseCors("AllowAngular");
+
 // Configure Pipeline
 if (app.Environment.IsDevelopment())
 {
@@ -65,21 +69,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
-// ==========================
-// Enable CORS
-// ==========================
-app.UseCors("AllowAngular");
-
-// Authentication
+// Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
 // Controllers
 app.MapControllers();
 
-// Home
-app.MapGet("/", () => "Blood Donation API is Running...");
+// Home Endpoint
+app.MapGet("/", () => "Blood Donation API is Running Successfully!");
 
 app.Run();

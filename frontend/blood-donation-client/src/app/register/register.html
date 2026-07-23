@@ -1,32 +1,187 @@
-<div class="register-container">
-  <div class="register-card">
+<div class="auth-container">
+  <!-- LEFT HERO PANEL -->
+  <div class="hero-panel">
+    <div class="hero-content">
+      <div class="hero-logo">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+          <path d="M24 4C24 4 8 20 8 30C8 38.8366 15.1634 46 24 46C32.8366 46 40 38.8366 40 30C40 20 24 4 24 4Z" fill="#dc2626"/>
+          <path d="M24 14C24 14 16 24 16 30C16 34.4183 19.5817 38 24 38C28.4183 38 32 34.4183 32 30C32 24 24 14 24 14Z" fill="#ffffff" opacity="0.3"/>
+        </svg>
+      </div>
+      <div class="hero-divider"></div>
+      <h1 class="hero-title">JOIN OUR<br>LIFE SAVING<br>NETWORK</h1>
+      <p class="hero-subtitle">
+        Become part of a verified blood donor community. Track your donations, stay notified about urgent requests, and help save lives every day.
+      </p>
 
-    <h2>Create Account</h2>
+      <!-- Benefits List -->
+      <div class="benefits-list">
+        <div class="benefit-item">
+          <div class="benefit-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+          <div>
+            <h4 class="benefit-title">Save Lives</h4>
+            <p class="benefit-desc">Every donation can save up to 3 lives</p>
+          </div>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon"><i class="fa-solid fa-chart-line"></i></div>
+          <div>
+            <h4 class="benefit-title">Track Donations</h4>
+            <p class="benefit-desc">Full history log of all your contributions</p>
+          </div>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon"><i class="fa-solid fa-bell"></i></div>
+          <div>
+            <h4 class="benefit-title">Get Notified</h4>
+            <p class="benefit-desc">Instant alerts for emergency blood needs</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    <input type="text"
-           placeholder="Full Name"
-           [(ngModel)]="fullName">
+  <!-- RIGHT REGISTRATION FORM -->
+  <div class="form-panel">
+    <div class="form-wrapper">
+      <div class="form-header">
+        <h2 class="form-title">Create Account</h2>
+        <p class="form-desc">Set up your BloodPulse profile in 3 easy steps.</p>
+      </div>
 
-    <input type="email"
-           placeholder="Email"
-           [(ngModel)]="email">
+      <!-- Step Indicator -->
+      <div class="step-indicator">
+        <div class="step-item" [class.active]="currentStep >= 1" [class.done]="currentStep > 1">
+          <div class="step-circle">
+            <i class="fa-solid fa-check" *ngIf="currentStep > 1"></i>
+            <span *ngIf="currentStep <= 1">1</span>
+          </div>
+          <span class="step-label">Personal</span>
+        </div>
+        <div class="step-line" [class.filled]="currentStep > 1"></div>
+        <div class="step-item" [class.active]="currentStep >= 2" [class.done]="currentStep > 2">
+          <div class="step-circle">
+            <i class="fa-solid fa-check" *ngIf="currentStep > 2"></i>
+            <span *ngIf="currentStep <= 2">2</span>
+          </div>
+          <span class="step-label">Security</span>
+        </div>
+        <div class="step-line" [class.filled]="currentStep > 2"></div>
+        <div class="step-item" [class.active]="currentStep >= 3">
+          <div class="step-circle"><span>3</span></div>
+          <span class="step-label">Role</span>
+        </div>
+      </div>
 
-    <input type="password"
-           placeholder="Password"
-           [(ngModel)]="password">
+      <!-- Alerts -->
+      <div class="alert alert-error" *ngIf="errorMessage">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span>{{ errorMessage }}</span>
+      </div>
+      <div class="alert alert-success" *ngIf="successMessage">
+        <i class="fa-solid fa-circle-check"></i>
+        <span>{{ successMessage }}</span>
+      </div>
 
-    <input type="text"
-           placeholder="Phone Number"
-           [(ngModel)]="phoneNumber">
+      <!-- Step 1: Personal Info -->
+      <div class="step-content" *ngIf="currentStep === 1">
+        <div class="field-group">
+          <label class="field-label">Full Name</label>
+          <div class="input-wrapper">
+            <i class="fa-regular fa-user input-icon"></i>
+            <input type="text" class="field-input" placeholder="John Doe" [(ngModel)]="fullName" name="fullName" required>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Email Address</label>
+          <div class="input-wrapper">
+            <i class="fa-regular fa-envelope input-icon"></i>
+            <input type="email" class="field-input" placeholder="you@example.com" [(ngModel)]="email" name="email" required>
+          </div>
+        </div>
+      </div>
 
-    <button (click)="register()">
-      Register
-    </button>
+      <!-- Step 2: Security -->
+      <div class="step-content" *ngIf="currentStep === 2">
+        <div class="field-group">
+          <label class="field-label">Create Password</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-lock input-icon"></i>
+            <input type="password" class="field-input" placeholder="Minimum 6 characters" [(ngModel)]="password" name="password" required>
+          </div>
+          <!-- Password Strength -->
+          <div class="strength-bar" *ngIf="password">
+            <div class="strength-fill" [class.weak]="getPasswordStrength() === 'weak'" [class.medium]="getPasswordStrength() === 'medium'" [class.strong]="getPasswordStrength() === 'strong'"></div>
+          </div>
+          <span class="strength-text" *ngIf="password">
+            Strength: <strong [class.text-red]="getPasswordStrength() === 'weak'" [class.text-yellow]="getPasswordStrength() === 'medium'" [class.text-green]="getPasswordStrength() === 'strong'">{{ getPasswordStrength() | titlecase }}</strong>
+          </span>
+        </div>
 
-    <p>
-      Already have an account?
-      <a routerLink="/login">Login</a>
-    </p>
+        <div class="field-group">
+          <label class="field-label">Confirm Password</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-lock input-icon"></i>
+            <input type="password" class="field-input" placeholder="Repeat your password" [(ngModel)]="confirmPassword" name="confirmPassword" required>
+          </div>
+          <span class="match-indicator" *ngIf="confirmPassword">
+            <i class="fa-solid" [class.fa-check-circle]="password === confirmPassword" [class.fa-times-circle]="password !== confirmPassword" [class.text-green]="password === confirmPassword" [class.text-red]="password !== confirmPassword"></i>
+            {{ password === confirmPassword ? 'Passwords match' : 'Passwords do not match' }}
+          </span>
+        </div>
 
+        <div class="field-group">
+          <label class="field-label">Phone Number <span class="optional-tag">(Optional)</span></label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-phone input-icon"></i>
+            <input type="tel" class="field-input" placeholder="+91 98765 43210" [(ngModel)]="phoneNumber" name="phoneNumber">
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Role Selection -->
+      <div class="step-content" *ngIf="currentStep === 3">
+        <p class="role-prompt">Choose your account type:</p>
+        <div class="role-cards">
+          <div class="role-card" [class.selected]="roleId === 2" (click)="roleId = 2">
+            <div class="role-card-icon donor-icon">
+              <i class="fa-solid fa-hand-holding-droplet"></i>
+            </div>
+            <h4 class="role-card-title">Blood Donor</h4>
+            <p class="role-card-desc">Register as a donor to contribute blood and track your donation history.</p>
+            <div class="role-check" *ngIf="roleId === 2"><i class="fa-solid fa-circle-check"></i></div>
+          </div>
+          <div class="role-card" [class.selected]="roleId === 1" (click)="roleId = 1">
+            <div class="role-card-icon admin-icon">
+              <i class="fa-solid fa-user-shield"></i>
+            </div>
+            <h4 class="role-card-title">Administrator</h4>
+            <p class="role-card-desc">Manage inventory, approve requests, and oversee the full blood bank system.</p>
+            <div class="role-check" *ngIf="roleId === 1"><i class="fa-solid fa-circle-check"></i></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Buttons -->
+      <div class="step-actions">
+        <button class="btn-back" *ngIf="currentStep > 1" (click)="prevStep()">
+          <i class="fa-solid fa-arrow-left"></i> Back
+        </button>
+        <div class="action-spacer" *ngIf="currentStep === 1"></div>
+
+        <button class="btn-submit" *ngIf="currentStep < totalSteps" (click)="nextStep()">
+          Continue <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <button class="btn-submit" *ngIf="currentStep === totalSteps" (click)="register()" [disabled]="isLoading">
+          <i class="fa-solid fa-spinner fa-spin" *ngIf="isLoading"></i>
+          <span>{{ isLoading ? 'Creating...' : 'Create Account' }}</span>
+        </button>
+      </div>
+
+      <div class="form-footer">
+        <span>Already have an account?</span>
+        <a routerLink="/login" class="link-red">Sign In</a>
+      </div>
+    </div>
   </div>
 </div>

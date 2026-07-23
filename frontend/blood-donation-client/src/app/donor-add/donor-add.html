@@ -1,63 +1,86 @@
-<div class="container">
-
-  <div class="card">
-
-    <h2>Add Donor</h2>
-
-    <select [(ngModel)]="bloodGroup">
-      <option value="">Select Blood Group</option>
-      <option value="A+">A+</option>
-      <option value="A-">A-</option>
-      <option value="B+">B+</option>
-      <option value="B-">B-</option>
-      <option value="AB+">AB+</option>
-      <option value="AB-">AB-</option>
-      <option value="O+">O+</option>
-      <option value="O-">O-</option>
-    </select>
-
-    <select [(ngModel)]="gender">
-      <option value="">Select Gender</option>
-      <option value="Male">Male</option>
-      <option value="Female">Female</option>
-      <option value="Other">Other</option>
-    </select>
-
-    <label>Date of Birth</label>
-    <input
-      type="date"
-      [(ngModel)]="dateOfBirth">
-
-    <input
-      type="number"
-      placeholder="Weight (kg)"
-      [(ngModel)]="weight">
-
-    <textarea
-      placeholder="Enter Address"
-      [(ngModel)]="address">
-    </textarea>
-
-    <label>Last Donation Date</label>
-    <input
-      type="date"
-      [(ngModel)]="lastDonationDate">
-
-    <div class="checkbox-container">
-      <input
-        type="checkbox"
-        id="eligible"
-        [(ngModel)]="isEligible">
-
-      <label for="eligible">
-        Eligible for Donation
-      </label>
+<div class="donor-add-wrapper">
+  <div class="glass-card form-card">
+    <div class="form-header flex items-center justify-between mb-6 pb-4 border-b border-slate-800">
+      <div>
+        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-user-plus text-red-500"></i> Enroll New Donor Profile
+        </h2>
+        <p class="text-xs text-slate-400 mt-1">Register donor medical attributes & blood group details</p>
+      </div>
+      <a routerLink="/donor-list" class="btn-secondary btn-sm">
+        <i class="fa-solid fa-arrow-left"></i> Back to Directory
+      </a>
     </div>
 
-    <button (click)="addDonor()">
-      Save Donor
-    </button>
+    <!-- Alert Messages -->
+    <div class="alert-banner alert-danger mb-4" *ngIf="errorMessage">
+      <i class="fa-solid fa-circle-exclamation"></i>
+      <span>{{ errorMessage }}</span>
+    </div>
+    <div class="alert-banner alert-success mb-4" *ngIf="successMessage">
+      <i class="fa-solid fa-circle-check"></i>
+      <span>{{ successMessage }}</span>
+    </div>
 
+    <form (ngSubmit)="addDonor()" class="grid grid-cols-2 gap-4">
+      <div class="form-group">
+        <label class="form-label"><i class="fa-solid fa-droplet text-red-500 me-1"></i> Blood Group *</label>
+        <select class="form-control" [(ngModel)]="bloodGroup" name="bloodGroup" required>
+          <option value="A+">A+</option>
+          <option value="A-">A-</option>
+          <option value="B+">B+</option>
+          <option value="B-">B-</option>
+          <option value="AB+">AB+</option>
+          <option value="AB-">AB-</option>
+          <option value="O+">O+</option>
+          <option value="O-">O-</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label"><i class="fa-solid fa-venus-mars me-1"></i> Gender *</label>
+        <select class="form-control" [(ngModel)]="gender" name="gender" required>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label"><i class="fa-regular fa-calendar me-1"></i> Date of Birth *</label>
+        <input type="date" class="form-control" [(ngModel)]="dateOfBirth" name="dateOfBirth" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label"><i class="fa-solid fa-weight-scale me-1"></i> Weight (kg) *</label>
+        <input type="number" class="form-control" placeholder="e.g. 70" [(ngModel)]="weight" name="weight" required>
+      </div>
+
+      <div class="form-group col-span-2">
+        <label class="form-label"><i class="fa-solid fa-location-dot me-1"></i> Residential Address</label>
+        <textarea class="form-control" rows="2" placeholder="Street, City, State" [(ngModel)]="address" name="address"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label"><i class="fa-regular fa-clock me-1"></i> Last Donation Date</label>
+        <input type="date" class="form-control" [(ngModel)]="lastDonationDate" name="lastDonationDate">
+      </div>
+
+      <div class="form-group flex items-center pt-6">
+        <label class="checkbox-label flex items-center gap-2 cursor-pointer text-sm text-slate-200">
+          <input type="checkbox" class="w-4 h-4 accent-red-500" [(ngModel)]="isEligible" name="isEligible">
+          Currently Eligible for Donation
+        </label>
+      </div>
+
+      <div class="col-span-2 flex justify-end gap-3 mt-4 pt-4 border-t border-slate-800">
+        <a routerLink="/donor-list" class="btn-secondary">Cancel</a>
+        <button type="submit" class="btn-primary" [disabled]="isLoading">
+          <i class="fa-solid fa-spinner fa-spin" *ngIf="isLoading"></i>
+          <i class="fa-solid fa-check" *ngIf="!isLoading"></i>
+          <span>{{ isLoading ? 'Enrolling...' : 'Save & Register Donor' }}</span>
+        </button>
+      </div>
+    </form>
   </div>
-
 </div>

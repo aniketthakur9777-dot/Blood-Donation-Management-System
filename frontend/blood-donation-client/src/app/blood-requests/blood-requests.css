@@ -1,0 +1,35 @@
+.toolbar-card {
+  padding: 1.25rem;
+}
+
+.active-filter {
+  background: rgba(230, 57, 70, 0.25) !important;
+  color: white !important;
+  border-color: rgba(230, 57, 70, 0.4) !important;
+}
+
+.blood-pill {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: #e63946;
+  background: rgba(230, 57, 70, 0.15);
+  border: 1px solid rgba(230, 57, 70, 0.3);
+  padding: 0.25rem 0.625rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-end { justify-content: flex-end; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-4 { gap: 1rem; }
+.grid { display: grid; }
+.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+.text-right { text-align: right; }

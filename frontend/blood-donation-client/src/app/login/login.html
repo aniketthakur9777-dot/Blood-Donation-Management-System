@@ -1,26 +1,121 @@
-<div class="login-container">
-  <div class="login-card">
+<div class="auth-container">
+  <!-- LEFT HERO PANEL -->
+  <div class="hero-panel">
+    <div class="hero-content">
+      <!-- Logo -->
+      <div class="hero-logo">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+          <path d="M24 4C24 4 8 20 8 30C8 38.8366 15.1634 46 24 46C32.8366 46 40 38.8366 40 30C40 20 24 4 24 4Z" fill="#dc2626"/>
+          <path d="M24 14C24 14 16 24 16 30C16 34.4183 19.5817 38 24 38C28.4183 38 32 34.4183 32 30C32 24 24 14 24 14Z" fill="#ffffff" opacity="0.3"/>
+        </svg>
+      </div>
 
-    <h2>Blood Donation Management System</h2>
+      <div class="hero-divider"></div>
 
-    <input
-      type="email"
-      placeholder="Enter Email"
-      [(ngModel)]="email">
+      <h1 class="hero-title">DONATING<br>BLOOD SAVES<br>LIVES</h1>
 
-    <input
-      type="password"
-      placeholder="Enter Password"
-      [(ngModel)]="password">
+      <p class="hero-subtitle">
+        Blood is made up of four main components. Red blood cells, platelets, plasma
+        and white blood cells. Each whole blood donation has the potential to save up to
+        <strong>three lives</strong>.
+      </p>
 
-    <button (click)="login()">
-      Login
-    </button>
+      <!-- Stats -->
+      <div class="hero-stats">
+        <div class="stat-block">
+          <span class="stat-number">1,200+</span>
+          <span class="stat-desc">Donors Registered</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-block">
+          <span class="stat-number">3,500+</span>
+          <span class="stat-desc">Lives Impacted</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-block">
+          <span class="stat-number">800+</span>
+          <span class="stat-desc">Units Collected</span>
+        </div>
+      </div>
 
-    <p>
-      Don't have an account?
-      <a routerLink="/register">Register</a>
-    </p>
+      <!-- Bottom Accent -->
+      <div class="hero-badges">
+        <span class="hero-badge"><i class="fa-solid fa-shield-heart"></i> Verified & Secure</span>
+        <span class="hero-badge"><i class="fa-solid fa-hospital"></i> Hospital Connected</span>
+      </div>
+    </div>
+  </div>
 
+  <!-- RIGHT LOGIN FORM PANEL -->
+  <div class="form-panel">
+    <div class="form-wrapper">
+      <!-- Header -->
+      <div class="form-header">
+        <h2 class="form-title">Welcome Back</h2>
+        <p class="form-desc">Sign in to your BloodPulse account to manage donations, inventory, and emergency requests.</p>
+      </div>
+
+      <!-- Error Alert -->
+      <div class="alert alert-error" *ngIf="errorMessage">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <!-- Login Form -->
+      <form (ngSubmit)="login()" class="auth-form">
+        <div class="field-group">
+          <label class="field-label">Email Address</label>
+          <div class="input-wrapper">
+            <i class="fa-regular fa-envelope input-icon"></i>
+            <input
+              type="email"
+              class="field-input"
+              placeholder="you@example.com"
+              [(ngModel)]="email"
+              name="email"
+              autocomplete="email"
+              required>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Password</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-lock input-icon"></i>
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              class="field-input"
+              placeholder="Enter your password"
+              [(ngModel)]="password"
+              name="password"
+              autocomplete="current-password"
+              required>
+            <button type="button" class="toggle-pw" (click)="showPassword = !showPassword">
+              <i class="fa-regular" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit" [disabled]="isLoading">
+          <i class="fa-solid fa-spinner fa-spin" *ngIf="isLoading"></i>
+          <span>{{ isLoading ? 'Signing in...' : 'Sign In' }}</span>
+          <i class="fa-solid fa-arrow-right" *ngIf="!isLoading"></i>
+        </button>
+      </form>
+
+      <!-- Demo Autofill -->
+      <div class="demo-section">
+        <span class="demo-label">Quick Demo:</span>
+        <button class="demo-chip" (click)="fillDemo()">
+          <i class="fa-solid fa-bolt"></i> Admin &mdash; aniket&#64;gmail.com
+        </button>
+      </div>
+
+      <!-- Register Link -->
+      <div class="form-footer">
+        <span>Don't have an account?</span>
+        <a routerLink="/register" class="link-red">Create Account</a>
+      </div>
+    </div>
   </div>
 </div>

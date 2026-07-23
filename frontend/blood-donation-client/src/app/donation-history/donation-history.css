@@ -1,0 +1,55 @@
+.toolbar-card {
+  padding: 1.25rem;
+}
+
+.search-box {
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+}
+
+.ps-10 {
+  padding-left: 2.5rem !important;
+}
+
+.blood-pill {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: #e63946;
+  background: rgba(230, 57, 70, 0.15);
+  border: 1px solid rgba(230, 57, 70, 0.3);
+  padding: 0.25rem 0.625rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e63946, #b91c1c);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-end { justify-content: flex-end; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-4 { gap: 1rem; }
+.grid { display: grid; }
+.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }

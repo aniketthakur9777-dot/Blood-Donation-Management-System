@@ -1,102 +1,184 @@
-<div class="container">
+<div class="donor-list-container">
+  <!-- Page Header -->
+  <div class="page-header flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+        <i class="fa-solid fa-users text-red-500"></i> Donor Registry & Directory
+      </h1>
+      <p class="text-xs text-slate-400 mt-1">Search, filter, and manage registered blood donors</p>
+    </div>
+    <button class="btn-primary" (click)="addDonor()">
+      <i class="fa-solid fa-user-plus"></i> Enroll New Donor
+    </button>
+  </div>
 
-    <div class="header">
+  <!-- Filter & Search Toolbar -->
+  <div class="glass-card toolbar-card mb-6">
+    <div class="search-box flex-1">
+      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <input
+        type="text"
+        class="form-control ps-10"
+        placeholder="Search donor name, email, or phone..."
+        [(ngModel)]="searchTerm"
+        (input)="applyFilters()">
+    </div>
 
-        <h2>🩸 Donor Management</h2>
+    <div class="filter-controls">
+      <div class="filter-group">
+        <label class="text-xs text-slate-400 block mb-1">Blood Group</label>
+        <select class="form-control" [(ngModel)]="selectedBloodGroup" (change)="applyFilters()">
+          <option value="ALL">All Groups</option>
+          <option value="A+">A+</option>
+          <option value="A-">A-</option>
+          <option value="B+">B+</option>
+          <option value="B-">B-</option>
+          <option value="AB+">AB+</option>
+          <option value="AB-">AB-</option>
+          <option value="O+">O+</option>
+          <option value="O-">O-</option>
+        </select>
+      </div>
 
-        <div>
-            <p><b>Total Donors:</b> {{ donors.length }}</p>
+      <div class="filter-group">
+        <label class="text-xs text-slate-400 block mb-1">Eligibility Status</label>
+        <select class="form-control" [(ngModel)]="selectedEligibility" (change)="applyFilters()">
+          <option value="ALL">All Statuses</option>
+          <option value="YES">Eligible Only</option>
+          <option value="NO">Ineligible</option>
+        </select>
+      </div>
+    </div>
+  </div>
 
-            <button class="add-btn" (click)="addDonor()">
-                + Add Donor
-            </button>
+  <!-- Data Table Card -->
+  <div class="glass-card overflow-hidden">
+    <div class="table-responsive" *ngIf="filteredDonors.length > 0">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Donor Name</th>
+            <th>Contact Info</th>
+            <th>Blood Group</th>
+            <th>Gender / Weight</th>
+            <th>Eligibility</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let donor of filteredDonors">
+            <td>
+              <div class="flex items-center gap-3">
+                <div class="blood-avatar">
+                  {{ donor.bloodGroup }}
+                </div>
+                <div>
+                  <h4 class="font-semibold text-white text-sm">{{ donor.fullName }}</h4>
+                  <span class="text-xs text-slate-400">ID: #{{ donor.donorId }}</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="text-xs">
+                <p class="text-slate-200"><i class="fa-regular fa-envelope me-1 text-slate-400"></i> {{ donor.email }}</p>
+                <p class="text-slate-400 mt-1"><i class="fa-solid fa-phone me-1 text-slate-500"></i> {{ donor.phoneNumber || 'N/A' }}</p>
+              </div>
+            </td>
+            <td>
+              <span class="blood-pill">{{ donor.bloodGroup }}</span>
+            </td>
+            <td>
+              <div class="text-xs text-slate-300">
+                <p>{{ donor.gender }}</p>
+                <p class="text-slate-400 mt-1" *ngIf="donor.weight">{{ donor.weight }} kg</p>
+              </div>
+            </td>
+            <td>
+              <span class="badge" [class.badge-success]="donor.isEligible" [class.badge-danger]="!donor.isEligible">
+                <i class="fa-solid" [class.fa-check]="donor.isEligible" [class.fa-xmark]="!donor.isEligible"></i>
+                {{ donor.isEligible ? 'Eligible' : 'Ineligible' }}
+              </span>
+            </td>
+            <td class="text-right">
+              <div class="flex justify-end gap-2">
+                <button class="btn-secondary btn-sm" (click)="openEditModal(donor)" title="Edit">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button class="btn-danger btn-sm" (click)="deleteDonor(donor.donorId)" title="Delete">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state p-12 text-center" *ngIf="filteredDonors.length === 0 && !isLoading">
+      <div class="empty-icon text-4xl text-slate-600 mb-3">
+        <i class="fa-solid fa-user-slash"></i>
+      </div>
+      <h3 class="text-lg font-semibold text-white">No Donors Found</h3>
+      <p class="text-xs text-slate-400 mt-1">Try adjusting your search criteria or register a new donor.</p>
+    </div>
+  </div>
+
+  <!-- Edit Donor Modal -->
+  <div class="modal-overlay" *ngIf="editingDonor">
+    <div class="modal-content">
+      <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
+        <h3 class="text-lg font-bold text-white"><i class="fa-solid fa-user-pen text-red-500 me-2"></i> Edit Donor Record</h3>
+        <button class="icon-btn" (click)="closeEditModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div class="form-group col-span-2">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-control" [(ngModel)]="editingDonor.fullName" readonly>
         </div>
 
+        <div class="form-group">
+          <label class="form-label">Blood Group</label>
+          <select class="form-control" [(ngModel)]="editingDonor.bloodGroup">
+            <option value="A+">A+</option>
+            <option value="A-">A-</option>
+            <option value="B+">B+</option>
+            <option value="B-">B-</option>
+            <option value="AB+">AB+</option>
+            <option value="AB-">AB-</option>
+            <option value="O+">O+</option>
+            <option value="O-">O-</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Gender</label>
+          <select class="form-control" [(ngModel)]="editingDonor.gender">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Weight (kg)</label>
+          <input type="number" class="form-control" [(ngModel)]="editingDonor.weight">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Eligible to Donate?</label>
+          <select class="form-control" [(ngModel)]="editingDonor.isEligible">
+            <option [ngValue]="true">Yes - Eligible</option>
+            <option [ngValue]="false">No - Ineligible</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-800">
+        <button class="btn-secondary" (click)="closeEditModal()">Cancel</button>
+        <button class="btn-primary" (click)="saveDonorEdit()">Save Changes</button>
+      </div>
     </div>
-
-    <!-- Testing -->
-    <pre>{{ donors | json }}</pre>
-
-    <table *ngIf="donors.length > 0">
-
-        <thead>
-
-            <tr>
-
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Blood Group</th>
-                <th>Gender</th>
-                <th>Weight</th>
-                <th>Eligible</th>
-                <th>Actions</th>
-
-            </tr>
-
-        </thead>
-
-        <tbody>
-
-            <tr *ngFor="let donor of donors">
-
-                <td>{{ donor.donorId }}</td>
-
-                <td>{{ donor.fullName }}</td>
-
-                <td>{{ donor.email }}</td>
-
-                <td>{{ donor.phoneNumber }}</td>
-
-                <td>
-                    <span class="blood">
-                        {{ donor.bloodGroup }}
-                    </span>
-                </td>
-
-                <td>{{ donor.gender }}</td>
-
-                <td>{{ donor.weight }} Kg</td>
-
-                <td>
-
-                    <span
-                        [class.yes]="donor.isEligible"
-                        [class.no]="!donor.isEligible">
-
-                        {{ donor.isEligible ? 'Eligible' : 'Not Eligible' }}
-
-                    </span>
-
-                </td>
-
-                <td>
-
-                    <button class="edit-btn">
-                        Edit
-                    </button>
-
-                    <button
-                        class="delete-btn"
-                        (click)="deleteDonor(donor.donorId)">
-
-                        Delete
-
-                    </button>
-
-                </td>
-
-            </tr>
-
-        </tbody>
-
-    </table>
-
-    <div *ngIf="donors.length == 0" class="no-data">
-
-        <h3>No Donors Found</h3>
-
-    </div>
-
+  </div>
 </div>

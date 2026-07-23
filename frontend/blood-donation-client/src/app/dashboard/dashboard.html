@@ -1,47 +1,253 @@
-<div class="dashboard">
-
-  <h1>🩸 Blood Donation Management System</h1>
-
-  <h2>Welcome {{ fullName }}</h2>
-
-  <div class="cards">
-
-    <div class="card">
-      <h3>Total Donors</h3>
-      <p>0</p>
+<div class="dashboard-container">
+  <!-- Top Broadcast Alert Ticker -->
+  <div class="ticker-banner glass-card mb-6" *ngIf="pendingRequestsCount > 0">
+    <div class="ticker-content flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="pulse-beacon"></span>
+        <span class="font-bold text-amber-400 text-xs uppercase tracking-wider">Urgent Attention:</span>
+        <span class="text-xs text-slate-200">There are <strong class="text-red-400 font-bold">{{ pendingRequestsCount }} pending emergency blood requests</strong> requiring admin authorization.</span>
+      </div>
+      <a routerLink="/requests" class="btn-secondary btn-sm">Review Requests <i class="fa-solid fa-arrow-right"></i></a>
     </div>
-
-    <div class="card">
-      <h3>Blood Requests</h3>
-      <p>0</p>
-    </div>
-
-    <div class="card">
-      <h3>Blood Inventory</h3>
-      <p>0</p>
-    </div>
-
-    <div class="card">
-      <h3>Donation History</h3>
-      <p>{{ totalDonors }}</p>
-    </div>
-
   </div>
 
-  <div class="menu">
+  <!-- Hero Welcome Banner -->
+  <div class="welcome-banner glass-card mb-8">
+    <div class="banner-content">
+      <div class="inline-badge mb-2">
+        <i class="fa-solid fa-shield-heart text-red-500"></i> Command Center
+      </div>
+      <h1 class="text-3xl font-extrabold text-white">
+        Welcome back, <span class="text-red-500">{{ fullName }}</span>
+      </h1>
+      <p class="text-slate-400 text-sm mt-1 max-w-xl">
+        Real-time blood bank inventory monitoring, donor directory management, and emergency requisition workflows.
+      </p>
+      
+      <div class="hero-tools mt-4 flex gap-3">
+        <button class="btn-secondary btn-sm" (click)="openCheckerModal()">
+          <i class="fa-solid fa-calculator text-emerald-400"></i> Donor Eligibility Check
+        </button>
+        <button class="btn-secondary btn-sm" (click)="openMatrixModal('O-')">
+          <i class="fa-solid fa-sitemap text-blue-400"></i> Blood Compatibility Chart
+        </button>
+      </div>
+    </div>
 
-    <button routerLink="/donor-list">Donors</button>
-
-    <button>Blood Requests</button>
-
-    <button>Inventory</button>
-
-    <button>Donation History</button>
-
-    <button>Notifications</button>
-
-    <button (click)="logout()">Logout</button>
-
+    <div class="quick-actions">
+      <a routerLink="/donor-add" class="btn-primary">
+        <i class="fa-solid fa-plus"></i> Add Donor
+      </a>
+      <a routerLink="/requests" class="btn-secondary">
+        <i class="fa-solid fa-heart-pulse text-red-400"></i> Request Blood
+      </a>
+    </div>
   </div>
 
+  <!-- Metric Stats Grid -->
+  <div class="stats-grid mb-8">
+    <!-- Stat 1: Total Donors -->
+    <div class="glass-card stat-card glass-card-hover" routerLink="/donor-list">
+      <div class="stat-icon bg-red-500/10 text-red-500 border-red-500/30">
+        <i class="fa-solid fa-users text-xl"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Registered Donors</span>
+        <h3 class="stat-value">{{ totalDonors }}</h3>
+        <span class="stat-subtext"><i class="fa-solid fa-check-circle text-emerald-400"></i> Active network</span>
+      </div>
+    </div>
+
+    <!-- Stat 2: Total Units Available -->
+    <div class="glass-card stat-card glass-card-hover" routerLink="/inventory">
+      <div class="stat-icon bg-emerald-500/10 text-emerald-400 border-emerald-500/30">
+        <i class="fa-solid fa-vial-circle-check text-xl"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Available Blood Units</span>
+        <h3 class="stat-value">{{ totalBloodUnits }} <span class="text-xs font-normal text-slate-400">Units</span></h3>
+        <span class="stat-subtext"><i class="fa-solid fa-boxes-stacked text-blue-400"></i> Ready for dispatch</span>
+      </div>
+    </div>
+
+    <!-- Stat 3: Pending Requests -->
+    <div class="glass-card stat-card glass-card-hover" routerLink="/requests">
+      <div class="stat-icon bg-amber-500/10 text-amber-400 border-amber-500/30">
+        <i class="fa-solid fa-clock text-xl"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Pending Requisitions</span>
+        <h3 class="stat-value">{{ pendingRequestsCount }}</h3>
+        <span class="stat-subtext"><i class="fa-solid fa-triangle-exclamation text-amber-400"></i> Requires review</span>
+      </div>
+    </div>
+
+    <!-- Stat 4: Total Donations -->
+    <div class="glass-card stat-card glass-card-hover" routerLink="/history">
+      <div class="stat-icon bg-purple-500/10 text-purple-400 border-purple-500/30">
+        <i class="fa-solid fa-hand-holding-hand text-xl"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Total Donations</span>
+        <h3 class="stat-value">{{ totalDonationsCount }}</h3>
+        <span class="stat-subtext"><i class="fa-solid fa-heart text-red-400"></i> Lives saved</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Row -->
+  <div class="grid-layout">
+    <!-- Left Column: Inventory Blood Group Distribution -->
+    <div class="glass-card section-card">
+      <div class="section-header">
+        <div>
+          <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-droplet text-red-500 me-2"></i> Blood Group Stock Matrix</h2>
+          <p class="text-xs text-slate-400">Click any blood type to view donor/recipient compatibility</p>
+        </div>
+        <a routerLink="/inventory" class="btn-secondary btn-sm">Manage Inventory</a>
+      </div>
+
+      <div class="blood-grid mt-4">
+        <div *ngFor="let item of inventoryList" class="blood-group-card glass-card-hover" (click)="openMatrixModal(item.bloodGroup)">
+          <div class="blood-type-badge">{{ item.bloodGroup }}</div>
+          <div class="blood-units">
+            <span class="count">{{ item.unitsAvailable }}</span>
+            <span class="unit-label">Units</span>
+          </div>
+
+          <div class="progress-bar-bg mt-1 mb-2">
+            <div class="progress-bar-fill" [style.width.%]="Math.min(100, (item.unitsAvailable / 15) * 100)"></div>
+          </div>
+
+          <span class="badge" [ngClass]="getStockBadgeClass(item.unitsAvailable)">
+            {{ getStockStatusLabel(item.unitsAvailable) }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Recent Emergency Requests -->
+    <div class="glass-card section-card">
+      <div class="section-header">
+        <div>
+          <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-hand-holding-medical text-amber-400 me-2"></i> Recent Blood Requests</h2>
+          <p class="text-xs text-slate-400">Live patient requisitions stream</p>
+        </div>
+        <a routerLink="/requests" class="btn-secondary btn-sm">View All</a>
+      </div>
+
+      <div class="requests-list mt-4">
+        <div *ngIf="recentRequests.length === 0" class="empty-state text-slate-400 text-sm py-4">
+          No blood requests recorded yet.
+        </div>
+        <div *ngFor="let req of recentRequests" class="request-item">
+          <div class="req-blood-badge">{{ req.bloodGroup }}</div>
+          <div class="req-details">
+            <h4 class="req-patient">{{ req.patientName }}</h4>
+            <span class="req-hospital"><i class="fa-solid fa-hospital text-slate-400 me-1"></i> {{ req.hospitalName }}</span>
+          </div>
+          <div class="req-status text-right">
+            <span class="badge" [class.badge-warning]="req.status === 'Pending'" [class.badge-success]="req.status === 'Approved' || req.status === 'Fulfilled'" [class.badge-danger]="req.status === 'Rejected'">
+              {{ req.status }}
+            </span>
+            <span class="req-units block text-xs text-slate-400 mt-1">{{ req.unitsRequired }} Units</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 1: Blood Compatibility Matrix -->
+  <div class="modal-overlay" *ngIf="showMatrixModal">
+    <div class="modal-content">
+      <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-sitemap text-red-500"></i> Compatibility Guide: Type <span class="text-red-400 font-extrabold">{{ selectedMatrixGroup }}</span>
+        </h3>
+        <button class="icon-btn" (click)="showMatrixModal = false"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <!-- Group Selector Tabs -->
+      <div class="group-tabs flex gap-2 flex-wrap mb-4">
+        <button *ngFor="let g of ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+']"
+                class="btn-secondary btn-sm"
+                [class.active-tab]="selectedMatrixGroup === g"
+                (click)="selectedMatrixGroup = g">
+          {{ g }}
+        </button>
+      </div>
+
+      <div class="compatibility-grid grid grid-cols-2 gap-4">
+        <div class="comp-box p-4 rounded-xl bg-slate-900 border border-slate-800">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-400 mb-2">
+            <i class="fa-solid fa-arrow-up-right-from-square me-1"></i> Can Give Blood To:
+          </h4>
+          <div class="flex gap-2 flex-wrap">
+            <span *ngFor="let target of compatibilityData[selectedMatrixGroup]?.canGiveTo" class="blood-pill">
+              {{ target }}
+            </span>
+          </div>
+        </div>
+
+        <div class="comp-box p-4 rounded-xl bg-slate-900 border border-slate-800">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-sky-400 mb-2">
+            <i class="fa-solid fa-arrow-down-left-and-arrow-up-right-to-center me-1"></i> Can Receive Blood From:
+          </h4>
+          <div class="flex gap-2 flex-wrap">
+            <span *ngFor="let source of compatibilityData[selectedMatrixGroup]?.canReceiveFrom" class="blood-pill">
+              {{ source }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end mt-6 pt-4 border-t border-slate-800">
+        <button class="btn-primary" (click)="showMatrixModal = false">Close Guide</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Donor Eligibility Checker -->
+  <div class="modal-overlay" *ngIf="showCheckerModal">
+    <div class="modal-content">
+      <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-calculator text-emerald-400"></i> Donor Eligibility Calculator
+        </h3>
+        <button class="icon-btn" (click)="showCheckerModal = false"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="grid grid-cols-3 gap-4 mb-4">
+        <div class="form-group">
+          <label class="form-label">Age (Years)</label>
+          <input type="number" class="form-control" [(ngModel)]="calcAge" (input)="runChecker()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Weight (kg)</label>
+          <input type="number" class="form-control" [(ngModel)]="calcWeight" (input)="runChecker()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Days Since Last</label>
+          <input type="number" class="form-control" [(ngModel)]="calcDays" (input)="runChecker()">
+        </div>
+      </div>
+
+      <div class="result-banner p-4 rounded-xl border mb-4"
+           [class.badge-success]="eligibilityResult?.isEligible"
+           [class.badge-danger]="!eligibilityResult?.isEligible">
+        <div class="flex items-center gap-3">
+          <i class="fa-solid text-xl" [class.fa-circle-check]="eligibilityResult?.isEligible" [class.fa-circle-xmark]="!eligibilityResult?.isEligible"></i>
+          <div>
+            <h4 class="font-bold text-sm">{{ eligibilityResult?.isEligible ? 'ELIGIBLE TO DONATE' : 'NOT CURRENTLY ELIGIBLE' }}</h4>
+            <p class="text-xs opacity-90 mt-1">{{ eligibilityResult?.reason }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-slate-800">
+        <button class="btn-secondary" (click)="showCheckerModal = false">Close</button>
+        <a routerLink="/donor-add" class="btn-primary" (click)="showCheckerModal = false">Proceed to Enrollment</a>
+      </div>
+    </div>
+  </div>
 </div>
