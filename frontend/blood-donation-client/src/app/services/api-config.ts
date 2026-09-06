@@ -1,1 +1,1 @@
-export const API_BASE_URL = 'http://localhost:5205/api';
+export const API_BASE_URL = 'https://blood-donation-management-system-f7k9.onrender.com/api';
