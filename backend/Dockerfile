@@ -2,15 +2,17 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 
 WORKDIR /src
 
-COPY BloodDonation.API/BloodDonation.API.csproj BloodDonation.API/
-RUN dotnet restore BloodDonation.API/BloodDonation.API.csproj
+COPY BloodDonation.API/BloodDonation.API/BloodDonation.API.csproj BloodDonation.API/BloodDonation.API/
 
-COPY BloodDonation.API/ BloodDonation.API/
+RUN dotnet restore BloodDonation.API/BloodDonation.API/BloodDonation.API.csproj
 
-WORKDIR /src/BloodDonation.API
-RUN dotnet publish BloodDonation.API.csproj -c Release -o /app/publish
+COPY . .
 
-FROM mcr.microsoft.com/dotnet/aspnet:10.0
+WORKDIR /src/BloodDonation.API/BloodDonation.API
+
+RUN dotnet publish BloodDonation.API.csproj -c Release -o /app/publish /p:UseAppHost=false
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 
 WORKDIR /app
 
